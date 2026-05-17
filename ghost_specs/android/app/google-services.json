@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "231398904940",
+    "project_id": "ghost-specs",
+    "storage_bucket": "ghost-specs.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:231398904940:android:da78f074022dbedce8f449",
+        "android_client_info": {
+          "package_name": "com.example.ghost_specs"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBPGQGEX-2hyeNAFwx0UOgLq9dqArlUfXA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
