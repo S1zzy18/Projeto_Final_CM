@@ -18,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailRegistoController = TextEditingController();
   final _passwordRegistoController = TextEditingController();
   final _carRegistoController = TextEditingController();
+  final _usernameRegistoController = TextEditingController();
 
   bool isLoading = false;
 
@@ -40,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
       
       if (userDoc.exists && userDoc.data() != null) {
         nomeDoCarroUtilizador = userDoc.data()!['carro'] ?? "Opel Corsa GS";
+        usernameUtilizador = userDoc.data()!['username'] ?? "Utilizador";
       } else {
         nomeDoCarroUtilizador = "Opel Corsa GS";
       }
@@ -58,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _criarConta() async {
-    if (_emailRegistoController.text.isEmpty || _passwordRegistoController.text.isEmpty || _carRegistoController.text.isEmpty) {
+    if (_emailRegistoController.text.isEmpty || _passwordRegistoController.text.isEmpty || _carRegistoController.text.isEmpty || _usernameRegistoController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Preenche todos os campos para o registo!')));
       return;
     }
@@ -72,10 +74,12 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       nomeDoCarroUtilizador = _carRegistoController.text.trim();
+      usernameUtilizador = _usernameRegistoController.text.trim();
 
       await FirebaseFirestore.instance.collection('utilizadores').doc(credential.user?.uid).set({
         'email': _emailRegistoController.text.trim(),
         'carro': nomeDoCarroUtilizador,
+        'username': usernameUtilizador,
       });
 
       if (mounted) {
@@ -144,6 +148,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextField(controller: _passwordRegistoController, obscureText: true, decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder())),
                           const SizedBox(height: 16),
                           TextField(controller: _carRegistoController, decoration: const InputDecoration(labelText: 'O teu Carro (ex: Opel Corsa GS)', border: OutlineInputBorder())),
+                          const SizedBox(height: 16),
+                          TextField(controller: _usernameRegistoController, decoration: const InputDecoration(labelText: 'Username público (aparece no ranking)', border: OutlineInputBorder())),
                           const SizedBox(height: 24),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, padding: const EdgeInsets.symmetric(vertical: 16)),
@@ -167,6 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
     _emailRegistoController.dispose();
     _passwordRegistoController.dispose();
     _carRegistoController.dispose();
+    _usernameRegistoController.dispose();
     super.dispose();
   }
 }

@@ -15,6 +15,8 @@ void main() async {
       appId: "1:231398904940:web:b0f882a5181a5059e8f449",
       messagingSenderId: "231398904940",
       projectId: "ghost-specs",
+      // Alternate bucket format — some projects use the .appspot.com bucket name
+      storageBucket: "ghost-specs.appspot.com",
     ),
   );
   
