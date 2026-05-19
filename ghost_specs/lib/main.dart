@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'screens/login_screen.dart'; // Importa o ecrã inicial
+import 'screens/main_navigation.dart';
+import 'screens/app_screens.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +34,46 @@ class GhostSpecApp extends StatelessWidget {
         scaffoldBackgroundColor: Colors.black,
         primaryColor: Colors.redAccent,
       ),
-      home: const LoginScreen(),
+      home: const AuthGate(),
     );
+  }
+}
+
+class AuthGate extends StatefulWidget {
+  const AuthGate({super.key});
+
+  @override
+  State<AuthGate> createState() => _AuthGateState();
+}
+
+class _AuthGateState extends State<AuthGate> {
+  User? _user;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    FirebaseAuth.instance.authStateChanges().listen((user) async {
+      _user = user;
+      if (_user != null) {
+        // Carrega o nome do carro do utilizador para a variável global
+        try {
+          final doc = await FirebaseFirestore.instance.collection('utilizadores').doc(_user!.uid).get();
+          if (doc.exists && doc.data() != null) {
+            nomeDoCarroUtilizador = doc.data()!['carro'] ?? nomeDoCarroUtilizador;
+          }
+        } catch (_) {}
+      }
+      if (mounted) setState(() => _loading = false);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (_user != null) {
+      return const MainNavigationScreen();
+    }
+    return const LoginScreen();
   }
 }
