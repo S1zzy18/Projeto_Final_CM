@@ -17,6 +17,7 @@ O GhostSpec nasceu para entusiastas do mundo automóvel e condutores que desejam
 	<img src="screenshots/Demo_Ranking_1.jpg" width="300" alt="Demo do GhostSpec">
 	<img src="screenshots/Demo_Ranking_2.jpg" width="300" alt="Demo do GhostSpec">
 </p>
+
 ---
 
 ## ⛓️ Requisitos e dependências principais
