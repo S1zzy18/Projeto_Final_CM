@@ -1,6 +1,6 @@
 # 🏎️ GhostSpec — Benchmarking App (MVP)
 
-Uma aplicação móvel multiplataforma concebida em Flutter para medir e partilhar métricas de performance de veículos em tempo real — incluindo top speed, 0→100 e tempos de condução — com rankings online via Firebase.
+Uma aplicação móvel multiplataforma concebida em Flutter para medir e partilhar métricas de performance de veículos em tempo real — incluindo top speed, 0→100 e velocidade maxima com rankings online via Firebase.
 
 Este README descreve o estado atual do projeto, como configurar e executar a aplicação, e quais os próximos passos recomendados.
 
@@ -111,8 +111,8 @@ Notas:
 
 O projeto segue uma organização simples orientada a funcionalidades com separação básica entre UI (`lib/screens`), serviços (`lib/services`) e inicialização (`lib/main.dart`).
 
-- Gestão de estado: atualmente utiliza `setState()` nos `StatefulWidget`s; sugestões para melhoria futura: migrar para `Provider` ou `Riverpod` para melhor escalabilidade.
-- Persistência: `SharedPreferences` para settings simples (implementado) e Firestore para dados partilhados/online.
+- Gestão de estado: atualmente utiliza `setState()` nos `StatefulWidget`s; (sugestões para melhoria futura: migrar para `Provider` ou `Riverpod` para melhor escalabilidade.)
+- Persistência: `SharedPreferences` para settings simples (`preferred_car_name`) e Firestore para dados partilhados/online.
 - Firestore: `rankings` e `max_speeds` collections; o código já atualiza/insere usando `uid` como id para `max_speeds` (evita múltiplos docs por utilizador).
 
 Mermaid (visão simples):
@@ -137,7 +137,7 @@ graph TD
 
 - **Firebase config:** gerar `lib/firebase_options.dart` com `flutterfire configure` e remover fallbacks hardcoded.
 - **Firestore rules:** definir regras para proteger dados do utilizador (limitar escrita/leitura por `uid`).
-- **Não comitar credenciais:** mantenha ficheiros sensíveis fora do repositório.
+- **Não comitar credenciais:** manter ficheiros sensíveis fora do repositório.
 
 ---
 
