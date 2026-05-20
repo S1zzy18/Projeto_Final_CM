@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'main_navigation.dart';
 import 'app_screens.dart'; // Para atualizar a variável nomeDoCarroUtilizador
+import '../services/preferences_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -21,6 +22,15 @@ class _LoginScreenState extends State<LoginScreen> {
   final _usernameRegistoController = TextEditingController();
 
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final pref = PreferencesService.getString('preferred_car_name');
+    if (pref != null && pref.isNotEmpty) {
+      _carRegistoController.text = pref;
+    }
+  }
 
   Future<void> _fazerLogin() async {
     if (_emailLoginController.text.isEmpty || _passwordLoginController.text.isEmpty) {
@@ -46,12 +56,16 @@ class _LoginScreenState extends State<LoginScreen> {
         nomeDoCarroUtilizador = "Opel Corsa GS";
       }
 
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
-        );
-      }
+      // Save preferred car locally
+      try {
+        await PreferencesService.setString('preferred_car_name', nomeDoCarroUtilizador);
+      } catch (_) {}
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+      );
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro no Login: ${e.message}')));
     } finally {
@@ -82,12 +96,16 @@ class _LoginScreenState extends State<LoginScreen> {
         'username': usernameUtilizador,
       });
 
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
-        );
-      }
+      // Save preferred car locally
+      try {
+        await PreferencesService.setString('preferred_car_name', nomeDoCarroUtilizador);
+      } catch (_) {}
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainNavigationScreen()),
+      );
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro no Registo: ${e.message}')));
     } finally {
