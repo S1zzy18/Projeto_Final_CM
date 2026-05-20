@@ -165,11 +165,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
         _lastSavedBestSpeed = 0.0;
       }
       }, onError: (error) {
-        print("Erro capturado no stream do GPS: $error");
+        debugPrint("Erro capturado no stream do GPS: $error");
       });
     } catch (e) {
       // Captura erros sincronos ao iniciar o stream (evita crash nativo não tratado)
-      print('Falha ao iniciar stream do Geolocator: $e');
+      debugPrint('Falha ao iniciar stream do Geolocator: $e');
     }
   }
 
@@ -196,7 +196,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               'tempo': time,
               'data': FieldValue.serverTimestamp(),
           });
-          print('Ranking atualizado: ${existing.id} (tempo: $time)');
+          debugPrint('Ranking atualizado: ${existing.id} (tempo: $time)');
           return existing.id;
         }
       }
@@ -210,10 +210,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         'tempo': time,
         'data': FieldValue.serverTimestamp(),
       });
-      print('Ranking gravado: ${docRef.id} (tempo: $time)');
+      debugPrint('Ranking gravado: ${docRef.id} (tempo: $time)');
       return docRef.id;
     } catch (e) {
-      print("Erro ao enviar dados para o Firestore: $e");
+      debugPrint("Erro ao enviar dados para o Firestore: $e");
       return null;
     }
   }
@@ -229,22 +229,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       final userDoc = await FirebaseFirestore.instance.collection('utilizadores').doc(user.uid).get();
       String? photoUrl;
       if (userDoc.exists && userDoc.data() != null) photoUrl = userDoc.data()!['photoUrl'] as String?;
-      final col = FirebaseFirestore.instance.collection('max_speeds');
-      final q = await col.where('uid', isEqualTo: user.uid).get();
-      double current = 0.0;
-      if (q.docs.isNotEmpty) {
-        // Determine the current saved max (take the maximum across any duplicates)
-        for (var d in q.docs) {
-          try {
-            final v = (d.data()['velocidade'] ?? 0) as num;
-            if (v > current) current = v.toDouble();
-          } catch (_) {}
-        }
 
-        // Only update if the new value is greater than current
+      final col = FirebaseFirestore.instance.collection('max_speeds');
+      final docRef = col.doc(user.uid);
+      final snapshot = await docRef.get();
+
+      if (snapshot.exists) {
+        final data = snapshot.data()!;
+        final current = (data['velocidade'] ?? 0) as num;
         if (velocidade > current) {
-          final firstDoc = q.docs.first;
-          await col.doc(firstDoc.id).update({
+          await docRef.update({
             'velocidade': velocidade,
             'username': usernameUtilizador,
             'photoUrl': photoUrl,
@@ -253,16 +247,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
             'data': FieldValue.serverTimestamp(),
           });
         }
-
-        // Delete any additional docs for this uid, keep the first one
-        for (var i = 1; i < q.docs.length; i++) {
-          try {
-            await col.doc(q.docs[i].id).delete();
-          } catch (_) {}
-        }
       } else {
-        // No existing doc, create one
-        await col.add({
+        // Create/overwrite the doc using uid as id to ensure one doc per user
+        await docRef.set({
           'uid': user.uid,
           'email': user.email,
           'username': usernameUtilizador,
@@ -273,7 +260,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         });
       }
     } catch (e) {
-      // ignore background errors
+      debugPrint('Erro ao atualizar velocidade máxima: $e');
     }
   }
 
@@ -514,13 +501,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     } on FirebaseException catch (e) {
       // Permission denied or other Firestore access error - don't crash the UI.
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao carregar perfil: [${e.code}] ${e.message}')));
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao carregar perfil: [${e.code}] ${e.message}')));
     } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao carregar perfil: $e')));
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao carregar perfil: $e')));
     }
   }
 
@@ -544,14 +529,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _photoUrl = url;
       });
 
-      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Foto de perfil atualizada.')));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Foto de perfil atualizada.')));
     } on FirebaseException catch (e) {
       // Provide clearer error messages depending on the Storage error code
       final code = e.code;
       final msg = e.message ?? e.toString();
-      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao enviar imagem: [$code] $msg')));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao enviar imagem: [$code] $msg')));
     } catch (e) {
-      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao enviar imagem: $e')));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro ao enviar imagem: $e')));
     }
   }
 
