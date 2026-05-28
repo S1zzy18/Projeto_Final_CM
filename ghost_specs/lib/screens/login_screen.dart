@@ -26,9 +26,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    final pref = PreferencesService.getString('preferred_car_name');
-    if (pref != null && pref.isNotEmpty) {
-      _carRegistoController.text = pref;
+    final prefEmail = PreferencesService.getString('preferred_email'); // Tenta carregar o email preferido do utilizador
+    if (prefEmail != null && prefEmail.isNotEmpty) {
+      _emailLoginController.text = prefEmail;
     }
   }
 
@@ -56,9 +56,9 @@ class _LoginScreenState extends State<LoginScreen> {
         nomeDoCarroUtilizador = "Opel Corsa GS";
       }
 
-      // Save preferred car locally
+      // Save email locally for auto-fill on login
       try {
-        await PreferencesService.setString('preferred_car_name', nomeDoCarroUtilizador);
+        await PreferencesService.setString('preferred_email', _emailLoginController.text.trim());
       } catch (_) {}
 
       if (!mounted) return;
@@ -69,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro no Login: ${e.message}')));
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
 
@@ -96,10 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
         'username': usernameUtilizador,
       });
 
-      // Save preferred car locally
-      try {
-        await PreferencesService.setString('preferred_car_name', nomeDoCarroUtilizador);
-      } catch (_) {}
+      // (Do not save email on registration; only save on login for autofill)
 
       if (!mounted) return;
       Navigator.pushReplacement(
@@ -109,9 +106,11 @@ class _LoginScreenState extends State<LoginScreen> {
     } on FirebaseAuthException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erro no Registo: ${e.message}')));
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) setState(() => isLoading = false);
     }
   }
+
+  
 
   @override
   Widget build(BuildContext context) {

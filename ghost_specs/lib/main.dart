@@ -1,33 +1,29 @@
-import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart'; // Importa o Flutter Material Design
+import 'package:firebase_core/firebase_core.dart'; // Importa o Firebase Core para inicialização
+import 'package:firebase_auth/firebase_auth.dart';  // Importa o Firebase Authentication para autenticação de utilizadores
+import 'package:cloud_firestore/cloud_firestore.dart'; // Importa o Cloud Firestore para acesso à base de dados
 import 'screens/login_screen.dart'; // Importa o ecrã inicial
-import 'screens/main_navigation.dart';
-import 'screens/app_screens.dart';
-import 'services/preferences_service.dart';
+import 'screens/main_navigation.dart'; // Importa o ecrã de navegação principal
+import 'screens/app_screens.dart'; // Importa outros ecrãs da aplicação
+import 'services/preferences_service.dart'; // Importa o serviço de preferências para armazenamento local
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized(); // Garante que o Flutter esteja inicializado antes de executar
   await PreferencesService.init();
-  final prefName = PreferencesService.getString('preferred_car_name');
-  if (prefName != null && prefName.isNotEmpty) {
-    nomeDoCarroUtilizador = prefName;
-    debugPrint('Carro preferido carregado: $prefName');
-  }
+  debugPrint('PreferencesService inicializado');
   
   try {
     // Try default initialization which reads native config files
     await Firebase.initializeApp();
   } catch (e) {
-    // Fallback to explicit options when native config is not available
+    // Se falhar, tenta inicialização manual com opções explícitas (útil para desenvolvimento local ou se os arquivos de configuração estiverem ausentes)
     await Firebase.initializeApp(
       options: const FirebaseOptions(
         apiKey: "AIzaSyCmbXYLYRNSjg58e1Ou2MMcZMcKC9nEW9Y",
         appId: "1:231398904940:web:b0f882a5181a5059e8f449",
         messagingSenderId: "231398904940",
         projectId: "ghost-specs",
-        // Alternate bucket format — some projects use the .appspot.com bucket name
+        // Tentar adicionar storageBucket para evitar erros relacionados a isso, mesmo que não seja usado diretamente
         storageBucket: "ghost-specs.appspot.com",
       ),
     );

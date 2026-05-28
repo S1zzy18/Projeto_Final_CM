@@ -46,6 +46,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  flutter_launcher_icons: ^0.10.0
+
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
   # activated in the `analysis_options.yaml` file located at the root of your
@@ -94,3 +96,12 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Configuration for flutter_launcher_icons (generate app launcher icons)
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/app_icon.png"
+  android_adaptive_icon:
+    foreground_image: "assets/app_icon.png"
+    background_color: "#000000"
